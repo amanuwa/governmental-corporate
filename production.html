@@ -1,1 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journalist Preparation Studio - Production Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #94a3b8;
+        }
+        /* Custom A4 Paper Styling */
+        .a4-paper {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 0 auto;
+            background: #ffffff;
+            color: #1f2937;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        /* Custom scrollbars for dark theme */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col justify-between">
 
+    <div>
+        <!-- Top Navigation Bar -->
+        <header class="border-b border-gray-800 bg-[#0b0f19] sticky top-0 z-50">
+            <div class="max-w-full px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <!-- Back Button -->
+                    <button onclick="window.location.href='dashboard.html'" class="bg-[#1f2937] hover:bg-gray-700 text-gray-300 text-xs font-mono px-3 py-1.5 rounded border border-gray-700 flex items-center space-x-1.5 transition">
+                        <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        <span>Back</span>
+                    </button>
+                    <span class="text-cyan-400 font-mono text-xs tracking-wider hidden sm:inline">// JOURNALIST PREPARATION STUDIO</span>
+                </div>
+
+                <!-- Top Right Controls: Logged-in User Only -->
+                <div class="flex items-center space-x-3">
+                    <button onclick="openHistoryModal()" class="bg-[#1f2937] hover:bg-gray-700 text-gray-300 text-xs font-mono px-3 py-1.5 rounded border border-gray-700 flex items-center space-x-1.5 transition">
+        <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>History</span>
+    </button>
+                    <span id="loggedInUserDisplay" class="text-sm font-mono font-bold text-cyan-400">Amanuel Bekele</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="max-w-full px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- LEFT SIDE: A4 Paper Workspace (Span 7) -->
+            <section class="lg:col-span-7 flex flex-col space-y-4">
+                <div class="flex items-center justify-between bg-[#111827] p-3 rounded-lg border border-gray-800">
+                    <div class="flex items-center space-x-3">
+                        <!-- File Explorer Button for A4 Workspace -->
+                        <label class="cursor-pointer bg-[#1f2937] hover:bg-gray-700 text-gray-200 text-xs font-mono px-3 py-2 rounded border border-gray-700 flex items-center space-x-2 transition">
+                            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            </svg>
+                            <span>Insert File</span>
+                            <input type="file" id="localFileLoader" class="hidden" onchange="loadLocalFile(event)">
+                        </label>
+                        <span id="loadedFileName" class="text-xs font-mono text-gray-500">// Draft Workspace</span>
+                        <!-- Clear Workspace Button -->
+                        <button onclick="clearWorkspace()" class="bg-[#1f2937] hover:bg-red-900/40 text-gray-300 hover:text-red-400 text-xs font-mono px-3 py-2 rounded border border-gray-700 flex items-center space-x-2 transition">
+                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            <span>Clear</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Blank A4 Paper Area -->
+                <div class="overflow-x-auto pb-4">
+                    <div id="a4Workspace" class="a4-paper flex flex-col justify-between max-h-[75vh] overflow-y-auto">
+                        <div id="a4Content" class="space-y-4">
+                            <div class="text-center text-gray-400 py-32 italic font-sans text-base">
+                                Insert a file or write content in the editor to populate workspace.
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-400 text-center pt-8 border-t border-gray-200 font-mono">
+                            PRODUCTION A4 PREVIEW WORKSPACE
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT SIDE: Content Editor Panel (Span 5) -->
+            <section class="lg:col-span-5 bg-[#111827] p-6 rounded-lg border border-gray-800 flex flex-col space-y-5">
+                <h2 class="text-xs font-mono text-cyan-400 tracking-wider border-b border-gray-800 pb-2">// CONTENT EDITOR PANEL</h2>
+
+                <!-- Title Text Box -->
+                <div class="flex flex-col space-y-1">
+                    <label for="postTitle" class="text-xs font-mono text-gray-400">TITLE</label>
+                    <input type="text" id="postTitle" placeholder="Enter post title..." 
+                           class="px-3 py-2 bg-[#0b0f19] border border-gray-800 rounded text-gray-200 focus:outline-none focus:border-cyan-500 text-sm font-sans">
+                </div>
+
+                <!-- Image URL Input & Render Panel -->
+                <div class="flex flex-col space-y-2">
+                    <label class="text-xs font-mono text-gray-400">FEATURED IMAGE / MEDIA URL</label>
+                    <input type="text" id="featuredImageUrl" class="w-full bg-[#0b0f19] border border-gray-800 rounded p-2 text-xs text-white focus:border-cyan-500 outline-none" placeholder="https://..." oninput="handleFeaturedImageInput(this)">
+                    <div class="border-2 border-gray-800 rounded-lg p-2 text-center bg-[#0b0f19] h-32 flex items-center justify-center overflow-hidden">
+                        <div id="imagePreviewContainer" class="w-full h-full flex flex-col items-center justify-center space-y-1 text-gray-500">
+                            <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span class="text-xs font-mono">Image preview will render here</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio URL Input & Player Panel -->
+                <div class="flex flex-col space-y-2">
+                    <label class="text-xs font-mono text-gray-400">AUDIO TRACK URL (OPTIONAL)</label>
+                    <input type="text" id="featuredAudioUrl" class="w-full bg-[#0b0f19] border border-gray-800 rounded p-2 text-xs text-white focus:border-cyan-500 outline-none" placeholder="https://... (mp3, wav)" oninput="handleFeaturedAudioInput(this)">
+                    <div id="audioPreviewContainer" class="hidden bg-[#0b0f19] border border-gray-800 rounded p-2 text-center text-xs text-gray-500 font-mono"></div>
+                </div>
+
+                <!-- Bigger Text Box for Main Text Content -->
+                <div class="flex flex-col space-y-1 flex-grow">
+                    <label for="postContent" class="text-xs font-mono text-gray-400">MAIN CONTENT TEXT</label>
+                    <textarea id="postContent" rows="4" placeholder="Type or paste main post text here..." 
+                              class="px-3 py-2 bg-[#0b0f19] border border-gray-800 rounded text-gray-200 focus:outline-none focus:border-cyan-500 text-sm font-sans resize-y"></textarea>
+                </div>
+
+                <!-- Distribute Button -->
+                <div class="mt-2">
+                    <button onclick="distributeContent()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-black font-mono text-xs font-bold py-3 rounded transition shadow-lg flex items-center justify-center space-x-2">
+                        <span>⚡ DISTRIBUTE CONTENT TO ALL PLATFORMS</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- BOTTOM SECTION: Distribution Panels -->
+        <section class="max-w-full px-6 py-8 border-t border-gray-800 mt-12 bg-[#0b0f19]">
+            <h3 class="text-xs font-mono text-cyan-400 tracking-wider mb-6">// MULTI-PLATFORM DISTRIBUTION CHANNELS</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- 1. TikTok Panel -->
+                <div class="platform-card bg-[#111827] p-5 rounded-lg border border-gray-800 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-900 border border-gray-700 text-white flex items-center justify-center rounded font-mono text-xs font-bold">TT</div>
+                            <h4 class="font-mono text-sm text-gray-200">TikTok Channel</h4>
+                        </div>
+                        <button onclick="addMediaInput(this)" class="bg-gray-900 hover:bg-gray-800 text-cyan-400 border border-gray-700 text-[10px] font-mono px-2 py-1 rounded transition">+ Image</button>
+                    </div>
+                    <p class="text-xs text-gray-500 font-sans">Short-form video layout and captions feed.</p>
+                    
+                    <div class="media-container flex flex-col space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" class="media-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-cyan-500 outline-none" placeholder="Paste image or video URL..." oninput="renderCardImage(this)">
+                        </div>
+                        <div class="image-display-container relative w-full h-24 bg-gray-900 border border-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+                            <span class="placeholder-text text-xs text-gray-500 font-mono">Preview will render here</span>
+                        </div>
+                    </div>
+
+                    <div class="audio-container flex flex-col space-y-2 pt-1 border-t border-gray-800">
+                        <input type="text" class="audio-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-green-500 outline-none" placeholder="Paste audio track URL..." oninput="renderCardAudio(this)">
+                        <div class="audio-display-container hidden"></div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Title</label>
+                        <input type="text" placeholder="Enter title..." class="platform-title w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-cyan-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Description / Caption</label>
+                        <textarea rows="6" placeholder="Write your post content here..." class="platform-body w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-cyan-500 outline-none resize-none"></textarea>
+                    </div>
+                    <div class="flex items-center space-x-2 pt-2">
+                        <button onclick="publishTo('TikTok', this)" class="bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 text-xs font-mono px-4 py-2 rounded transition font-bold whitespace-nowrap">Publish</button>
+                        <select class="account-select w-full bg-gray-900 border border-gray-700 text-gray-300 text-xs font-mono rounded p-2 outline-none">
+                            <option value="">Select Account...</option>
+                            <option value="tiktok account 1">tiktok account 1</option>
+                            <option value="tiktok account 2">tiktok account 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 2. Instagram Panel -->
+                <div class="platform-card bg-[#111827] p-5 rounded-lg border border-gray-800 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-900 border border-gray-700 text-pink-400 flex items-center justify-center rounded font-mono text-xs font-bold">IG</div>
+                            <h4 class="font-mono text-sm text-gray-200">Instagram Studio</h4>
+                        </div>
+                        <button onclick="addMediaInput(this)" class="bg-gray-900 hover:bg-gray-800 text-pink-400 border border-gray-700 text-[10px] font-mono px-2 py-1 rounded transition">+ Image</button>
+                    </div>
+                    <p class="text-xs text-gray-500 font-sans">Feed post, story and carousel integration.</p>
+                    
+                    <div class="media-container flex flex-col space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" class="media-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-pink-500 outline-none" placeholder="Paste image or video URL..." oninput="renderCardImage(this)">
+                        </div>
+                        <div class="image-display-container relative w-full h-24 bg-gray-900 border border-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+                            <span class="placeholder-text text-xs text-gray-500 font-mono">Preview will render here</span>
+                        </div>
+                    </div>
+
+                    <div class="audio-container flex flex-col space-y-2 pt-1 border-t border-gray-800">
+                        <input type="text" class="audio-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-green-500 outline-none" placeholder="Paste audio track URL..." oninput="renderCardAudio(this)">
+                        <div class="audio-display-container hidden"></div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Title</label>
+                        <input type="text" placeholder="Enter title..." class="platform-title w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-pink-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Description / Caption</label>
+                        <textarea rows="6" placeholder="Write your post content here..." class="platform-body w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-pink-500 outline-none resize-none"></textarea>
+                    </div>
+                    <div class="flex items-center space-x-2 pt-2">
+                        <button onclick="publishTo('Instagram', this)" class="bg-gray-900 hover:bg-gray-800 text-pink-400 border border-gray-700 text-xs font-mono px-4 py-2 rounded transition font-bold whitespace-nowrap">Publish</button>
+                        <select class="account-select w-full bg-gray-900 border border-gray-700 text-gray-300 text-xs font-mono rounded p-2 outline-none">
+                            <option value="">Select Account...</option>
+                            <option value="account_1">instagram account 1</option>
+                            <option value="account_2">instagram account 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 3. Facebook Panel -->
+                <div class="platform-card bg-[#111827] p-5 rounded-lg border border-gray-800 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-900 border border-gray-700 text-blue-500 flex items-center justify-center rounded font-mono text-xs font-bold">FB</div>
+                            <h4 class="font-mono text-sm text-gray-200">Facebook Page</h4>
+                        </div>
+                        <button onclick="addMediaInput(this)" class="bg-gray-900 hover:bg-gray-800 text-blue-400 border border-gray-700 text-[10px] font-mono px-2 py-1 rounded transition">+ Image</button>
+                    </div>
+                    <p class="text-xs text-gray-500 font-sans">Page updates, community sharing and video links.</p>
+                    
+                    <div class="media-container flex flex-col space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" class="media-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-blue-500 outline-none" placeholder="Paste image or video URL..." oninput="renderCardImage(this)">
+                        </div>
+                        <div class="image-display-container relative w-full h-24 bg-gray-900 border border-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+                            <span class="placeholder-text text-xs text-gray-500 font-mono">Preview will render here</span>
+                        </div>
+                    </div>
+
+                    <div class="audio-container flex flex-col space-y-2 pt-1 border-t border-gray-800">
+                        <input type="text" class="audio-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-green-500 outline-none" placeholder="Paste audio track URL..." oninput="renderCardAudio(this)">
+                        <div class="audio-display-container hidden"></div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Title</label>
+                        <input type="text" placeholder="Enter title..." class="platform-title w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Description / Caption</label>
+                        <textarea rows="6" placeholder="Write your post content here..." class="platform-body w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-blue-500 outline-none resize-none"></textarea>
+                    </div>
+                    <div class="flex items-center space-x-2 pt-2">
+                        <button onclick="publishTo('Facebook', this)" class="bg-gray-900 hover:bg-gray-800 text-blue-500 border border-gray-700 text-xs font-mono px-4 py-2 rounded transition font-bold whitespace-nowrap">Publish</button>
+                        <select class="account-select w-full bg-gray-900 border border-gray-700 text-gray-300 text-xs font-mono rounded p-2 outline-none">
+                            <option value="">Select Account...</option>
+                            <option value="facebook page 1">facebook page 1</option>
+                            <option value="facebook page 2">facebook page 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 4. Twitter / X Panel -->
+                <div class="platform-card bg-[#111827] p-5 rounded-lg border border-gray-800 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-900 border border-gray-700 text-cyan-400 flex items-center justify-center rounded font-mono text-xs font-bold">TW</div>
+                            <h4 class="font-mono text-sm text-gray-200">Twitter / X Stream</h4>
+                        </div>
+                        <button onclick="addMediaInput(this)" class="bg-gray-900 hover:bg-gray-800 text-cyan-400 border border-gray-700 text-[10px] font-mono px-2 py-1 rounded transition">+ Image</button>
+                    </div>
+                    <p class="text-xs text-gray-500 font-sans">Character checked microblog and media attachments.</p>
+                    
+                    <div class="media-container flex flex-col space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" class="media-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-cyan-500 outline-none" placeholder="Paste image or video URL..." oninput="renderCardImage(this)">
+                        </div>
+                        <div class="image-display-container relative w-full h-24 bg-gray-900 border border-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+                            <span class="placeholder-text text-xs text-gray-500 font-mono">Preview will render here</span>
+                        </div>
+                    </div>
+
+                    <div class="audio-container flex flex-col space-y-2 pt-1 border-t border-gray-800">
+                        <input type="text" class="audio-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-green-500 outline-none" placeholder="Paste audio track URL..." oninput="renderCardAudio(this)">
+                        <div class="audio-display-container hidden"></div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Title</label>
+                        <input type="text" placeholder="Enter title..." class="platform-title w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-cyan-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Description / Caption</label>
+                        <textarea rows="6" placeholder="Write your post content here..." class="platform-body w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-cyan-500 outline-none resize-none"></textarea>
+                    </div>
+                    <div class="flex items-center space-x-2 pt-2">
+                        <button onclick="publishTo('Twitter', this)" class="bg-gray-900 hover:bg-gray-800 text-cyan-400 border border-gray-700 text-xs font-mono px-4 py-2 rounded transition font-bold whitespace-nowrap">Publish</button>
+                        <select class="account-select w-full bg-gray-900 border border-gray-700 text-gray-300 text-xs font-mono rounded p-2 outline-none">
+                            <option value="">Select Account...</option>
+                            <option value="account_1">twitter account 1</option>
+                            <option value="account_2">twitter account 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 5. Telegram Panel -->
+                <div class="platform-card bg-[#111827] p-5 rounded-lg border border-gray-800 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-900 border border-gray-700 text-sky-400 flex items-center justify-center rounded font-mono text-xs font-bold">TG</div>
+                            <h4 class="font-mono text-sm text-gray-200">Telegram Channel</h4>
+                        </div>
+                        <button onclick="addMediaInput(this)" class="bg-gray-900 hover:bg-gray-800 text-sky-400 border border-gray-700 text-[10px] font-mono px-2 py-1 rounded transition">+ Image</button>
+                    </div>
+                    <p class="text-xs text-gray-500 font-sans">Direct subscriber announcement feed stream.</p>
+                    
+                    <div class="media-container flex flex-col space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" class="media-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-sky-500 outline-none" placeholder="Paste image or video URL..." oninput="renderCardImage(this)">
+                        </div>
+                        <div class="image-display-container relative w-full h-24 bg-gray-900 border border-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+                            <span class="placeholder-text text-xs text-gray-500 font-mono">Preview will render here</span>
+                        </div>
+                    </div>
+
+                    <div class="audio-container flex flex-col space-y-2 pt-1 border-t border-gray-800">
+                        <input type="text" class="audio-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-green-500 outline-none" placeholder="Paste audio track URL..." oninput="renderCardAudio(this)">
+                        <div class="audio-display-container hidden"></div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Title</label>
+                        <input type="text" placeholder="Enter title..." class="platform-title w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-sky-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Description / Caption</label>
+                        <textarea rows="6" placeholder="Write your post content here..." class="platform-body w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-sky-500 outline-none resize-none"></textarea>
+                    </div>
+                    <div class="flex items-center space-x-2 pt-2">
+                        <button onclick="publishTo('Telegram', this)" class="bg-gray-900 hover:bg-gray-800 text-sky-400 border border-gray-700 text-xs font-mono px-4 py-2 rounded transition font-bold whitespace-nowrap">Publish</button>
+                        <select class="account-select w-full bg-gray-900 border border-gray-700 text-gray-300 text-xs font-mono rounded p-2 outline-none">
+                            <option value="">Select Account...</option>
+                            <option value="account_1">telegram channel 1</option>
+                            <option value="account_2">telegram channel 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 6. YouTube Panel -->
+                <div class="platform-card bg-[#111827] p-5 rounded-lg border border-gray-800 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-900 border border-gray-700 text-red-500 flex items-center justify-center rounded font-mono text-xs font-bold">YT</div>
+                            <h4 class="font-mono text-sm text-gray-200">YouTube Studio</h4>
+                        </div>
+                        <button onclick="addMediaInput(this)" class="bg-gray-900 hover:bg-gray-800 text-red-400 border border-gray-700 text-[10px] font-mono px-2 py-1 rounded transition">+ Image</button>
+                    </div>
+                    <p class="text-xs text-gray-500 font-sans">Video descriptions, tags and community posts.</p>
+                    
+                    <div class="media-container flex flex-col space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" class="media-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-red-500 outline-none" placeholder="Paste image or video URL..." oninput="renderCardImage(this)">
+                        </div>
+                        <div class="image-display-container relative w-full h-24 bg-gray-900 border border-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+                            <span class="placeholder-text text-xs text-gray-500 font-mono">Preview will render here</span>
+                        </div>
+                    </div>
+
+                    <div class="audio-container flex flex-col space-y-2 pt-1 border-t border-gray-800">
+                        <input type="text" class="audio-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-green-500 outline-none" placeholder="Paste audio track URL..." oninput="renderCardAudio(this)">
+                        <div class="audio-display-container hidden"></div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Title</label>
+                        <input type="text" placeholder="Enter title..." class="platform-title w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-red-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-mono text-gray-400 uppercase">Post Description / Caption</label>
+                        <textarea rows="6" placeholder="Write your post content here..." class="platform-body w-full bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded p-2 mt-1 focus:border-red-500 outline-none resize-none"></textarea>
+                    </div>
+                    <div class="flex items-center space-x-2 pt-2">
+                        <button onclick="publishTo('YouTube', this)" class="bg-gray-900 hover:bg-gray-800 text-red-500 border border-gray-700 text-xs font-mono px-4 py-2 rounded transition font-bold whitespace-nowrap">Publish</button>
+                        <select class="account-select w-full bg-gray-900 border border-gray-700 text-gray-300 text-xs font-mono rounded p-2 outline-none">
+                            <option value="">Select Account...</option>
+                            <option value="youtube account 1">youtube account 1</option>
+                            <option value="youtube account 2">youtube account 2</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+    <script src="session-timeout.js"></script>
+
+    <!-- JavaScript Handlers -->
+    <script>
+        // 1. Featured Image Live Rendering
+        function handleFeaturedImageInput(input) {
+            const url = input.value.trim();
+            const container = document.getElementById('imagePreviewContainer');
+            if (!url) {
+                container.innerHTML = `
+                    <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-xs font-mono">Image preview will render here</span>
+                `;
+                return;
+            }
+            container.innerHTML = `<img src="${url}" class="w-full h-full object-cover rounded" onerror="this.onerror=null; this.parentNode.innerHTML='<span class=\'text-xs text-red-400 font-mono\'>Failed to load image URL</span>';">`;
+        }
+
+        // 2. Featured Audio Live Rendering
+        function handleFeaturedAudioInput(input) {
+            const url = input.value.trim();
+            const container = document.getElementById('audioPreviewContainer');
+            if (!url) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                return;
+            }
+            container.classList.remove('hidden');
+            container.innerHTML = `<audio controls class="w-full h-8"><source src="${url}" type="audio/mpeg">Your browser does not support audio element.</audio>`;
+        }
+
+        // 3. Add Multi-Image input fields dynamically inside a platform card
+        function addMediaInput(btn) {
+            const card = btn.closest('.platform-card');
+            const mediaContainer = card.querySelector('.media-container');
+            const newInputRow = document.createElement('div');
+            newInputRow.className = "flex items-center space-x-2 mt-2";
+            newInputRow.innerHTML = `
+                <input type="text" class="media-url-input w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white focus:border-cyan-500 outline-none" placeholder="Paste extra image or video URL..." oninput="renderCardImage(this)">
+                <button onclick="this.parentElement.remove()" class="bg-red-900/30 text-red-400 hover:bg-red-900/60 text-xs px-2 py-2 rounded">✕</button>
+            `;
+            mediaContainer.insertBefore(newInputRow, card.querySelector('.image-display-container'));
+        }
+
+        // 4. Render Card Previews
+        function renderCardImage(input) {
+            const card = input.closest('.platform-card');
+            const displayContainer = card.querySelector('.image-display-container');
+            const url = input.value.trim();
+            if (!url) {
+                displayContainer.innerHTML = `<span class="placeholder-text text-xs text-gray-500 font-mono">Preview will render here</span>`;
+                return;
+            }
+            displayContainer.innerHTML = `<img src="${url}" class="w-full h-full object-cover rounded" onerror="this.onerror=null; this.parentNode.innerHTML='<span class=\'text-xs text-red-400 font-mono\'>Failed to load preview</span>';">`;
+        }
+
+        function renderCardAudio(input) {
+            const card = input.closest('.platform-card');
+            const displayContainer = card.querySelector('.audio-display-container');
+            const url = input.value.trim();
+            if (!url) {
+                displayContainer.innerHTML = '';
+                displayContainer.classList.add('hidden');
+                return;
+            }
+            displayContainer.classList.remove('hidden');
+            displayContainer.innerHTML = `<audio controls class="w-full h-7"><source src="${url}" type="audio/mpeg">Audio not supported.</audio>`;
+        }
+
+        // 5. Distribute Content to All Platforms (Images + Audio + Title + Content)
+        function distributeContent() {
+            const title = document.getElementById('postTitle').value;
+            const imageUrl = document.getElementById('featuredImageUrl').value;
+            const audioUrl = document.getElementById('featuredAudioUrl').value;
+            const content = document.getElementById('postContent').value;
+
+            const platformCards = document.querySelectorAll('.platform-card');
+
+            platformCards.forEach(card => {
+                const titleInput = card.querySelector('.platform-title');
+                if (titleInput) titleInput.value = title;
+
+                const bodyInput = card.querySelector('.platform-body');
+                if (bodyInput) bodyInput.value = content;
+
+                // Handle Image
+                const firstMediaInput = card.querySelector('.media-url-input');
+                const displayContainer = card.querySelector('.image-display-container');
+                if (firstMediaInput && imageUrl) firstMediaInput.value = imageUrl;
+                if (displayContainer && imageUrl) {
+                    displayContainer.innerHTML = `<img src="${imageUrl}" class="w-full h-full object-cover rounded" onerror="this.onerror=null; this.parentNode.innerHTML='<span class=\'text-xs text-red-400 font-mono\'>Failed to load preview</span>';">`;
+                }
+
+                // Handle Audio
+                const firstAudioInput = card.querySelector('.audio-url-input');
+                const audioDisplayContainer = card.querySelector('.audio-display-container');
+                if (firstAudioInput && audioUrl) firstAudioInput.value = audioUrl;
+                if (audioDisplayContainer && audioUrl) {
+                    audioDisplayContainer.classList.remove('hidden');
+                    audioDisplayContainer.innerHTML = `<audio controls class="w-full h-7"><source src="${audioUrl}" type="audio/mpeg">Audio not supported.</audio>`;
+                }
+            });
+
+            alert('Content, Media, and Audio tracks successfully distributed to all platforms!');
+        }
+
+        // 6. Utilities
+        function clearWorkspace() {
+            document.getElementById('postTitle').value = '';
+            document.getElementById('featuredImageUrl').value = '';
+            document.getElementById('featuredAudioUrl').value = '';
+            document.getElementById('postContent').value = '';
+            handleFeaturedImageInput({ value: '' });
+            handleFeaturedAudioInput({ value: '' });
+            document.getElementById('a4Content').innerHTML = `
+                <div class="text-center text-gray-400 py-32 italic font-sans text-base">
+                    Insert a file or write content in the editor to populate workspace.
+                </div>
+            `;
+        }
+        function openHistoryModal() {
+    // This immediately redirects the browser to historypage.html
+    window.location.href = 'historypage.html';
+}
+
+        function loadLocalFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('loadedFileName').innerText = '// ' + file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('a4Content').innerHTML = `<div class="font-sans text-sm whitespace-pre-wrap">${e.target.result}</div>`;
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function publishTo(platform, btn) {
+            alert('Content successfully published to ' + platform + '!');
+        }
+    </script>
+</body>
+</html>
