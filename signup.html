@@ -83,18 +83,40 @@
     </footer>
         <script src="session-timeout.js"></script>
 
-    <script>
-        function handleSignup(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const corporation = document.getElementById('corporation').value;
-            
-            localStorage.setItem('studioUser', JSON.stringify({ username, email, corporation }));
-            
+  <script type="module">
+    import { supabase } from './config.js';
+
+    window.handleSignup = async function(event) {
+        event.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const corporation = document.getElementById('corporation').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            // 1. Register user with Supabase Auth
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        username: username,
+                        corporation: corporation
+                    }
+                }
+            });
+
+            if (error) throw error;
+
             alert("Registration successful. Routing to Secure Dashboard...");
             window.location.href = 'dashboard.html';
+
+        } catch (err) {
+            alert("Registration failed: " + err.message);
+            console.error("Signup error:", err);
         }
-    </script>
+    }
+</script>
 </body>
 </html>
