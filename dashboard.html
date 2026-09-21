@@ -460,18 +460,18 @@
         }
         checkUserSession();
 
-        window.handleSignOut = async function() {
-            try {
-                const { error } = await supabase.auth.signOut();
-                if (error) {
-                    console.error("Sign out error:", error.message);
-                }
-                window.location.href = 'index.html';
-            } catch (err) {
-                console.error("Unexpected sign out error:", err);
-                window.location.href = 'index.html';
-            }
+      window.handleSignOut = async function() {
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error("Sign out error:", error.message);
         }
+        window.location.href = 'index.html';
+    } catch (err) {
+        console.error("Unexpected sign out error:", err);
+        window.location.href = 'index.html';
+    }
+}
     </script>
 </body>
 </html>
