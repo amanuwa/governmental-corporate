@@ -30,10 +30,10 @@
             </div>
 
             <form onsubmit="handleSignin(event)" class="space-y-5 font-mono text-xs">
-                <!-- Username or Email -->
+                <!-- Email -->
                 <div>
-                    <label class="block text-gray-700 mb-1.5 uppercase tracking-wider text-[10px]">Institutional Email / Username</label>
-                    <input type="text" id="loginIdentifier" required placeholder="operator@gov-corporate.org" 
+                    <label class="block text-gray-700 mb-1.5 uppercase tracking-wider text-[10px]">Institutional Email</label>
+                    <input type="email" id="loginEmail" required placeholder="operator@gov-corporate.org" 
                         class="w-full bg-gray-50 border border-gray-300 rounded px-3.5 py-2.5 text-gray-900 focus:outline-none focus:border-cyan-600 transition">
                 </div>
 
@@ -48,7 +48,7 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded tracking-wider uppercase transition shadow-md shadow-cyan-600/20 mt-2">
+                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded tracking-wider uppercase transition shadow-md shadow-cyan-600/20 mt-2 cursor-pointer">
                     Authenticate & Access Studio
                 </button>
             </form>
@@ -65,10 +65,31 @@
         // Journalist Preparation Studio &copy; 2026 - Institutional Security Division
     </footer>
 
-    <script>
-        function handleSignin(event) {
+    <script src="session-timeout.js"></script>
+
+    <!-- Supabase Authentication Module -->
+    <script type="module">
+        import { supabase } from './config.js';
+
+        window.handleSignin = async function(event) {
             event.preventDefault();
-            window.location.href = 'dashboard.html';
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                // Authentication successful, redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } catch (err) {
+                alert("Authentication Failed: " + err.message);
+                console.error("Sign-in error:", err);
+            }
         }
     </script>
 </body>
