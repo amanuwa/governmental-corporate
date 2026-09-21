@@ -180,6 +180,7 @@
     <!-- Application Script Handling State, Tabs, and Panels -->
     <script>
         // Mock Database of Messages separated by type ('arrived' and 'sent')
+        import { supabase } from './config.js'; // <-- Make sure this file actually exists right here!
         const messagesData = {
             arrived: [
                 {
