@@ -180,7 +180,6 @@
     <!-- Application Script Handling State, Tabs, and Panels -->
     <script>
         // Mock Database of Messages separated by type ('arrived' and 'sent')
-        import { supabase } from './config.js'; // <-- Make sure this file actually exists right here!
         const messagesData = {
             arrived: [
                 {
@@ -240,10 +239,22 @@
 
         let currentTab = 'arrived';
         let activeMessage = null;
+        let searchQuery = '';
 
-        function renderMessages() {
+        window.renderMessages = function() {
             const container = document.getElementById('messages-container');
-            const list = messagesData[currentTab];
+            let list = messagesData[currentTab];
+            
+            // Filter by search query if active
+            if (searchQuery.trim() !== '') {
+                const q = searchQuery.toLowerCase();
+                list = list.filter(m => 
+                    m.sender.toLowerCase().includes(q) || 
+                    m.previewPrefix.toLowerCase().includes(q) || 
+                    m.previewText.toLowerCase().includes(q) ||
+                    m.fullBody.toLowerCase().includes(q)
+                );
+            }
             
             // Update UI elements based on tab
             document.getElementById('current-list-title').textContent = currentTab === 'arrived' ? 'Arrived Messages' : 'Sent Messages';
@@ -280,7 +291,7 @@
             });
         }
 
-        function switchTab(tab) {
+        window.switchTab = function(tab) {
             currentTab = tab;
             activeMessage = null;
             document.getElementById('detail-panel').classList.add('hidden');
@@ -296,10 +307,10 @@
                 btnSent.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center justify-between bg-blue-600 text-white shadow";
                 btnArrived.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center justify-between text-slate-300 hover:bg-slate-800";
             }
-            renderMessages();
+            window.renderMessages();
         }
 
-        function selectMessage(id) {
+        window.selectMessage = function(id) {
             const list = messagesData[currentTab];
             const msg = list.find(m => m.id === id);
             if (!msg) return;
@@ -315,15 +326,15 @@
             document.getElementById('detail-panel').classList.remove('hidden');
             document.getElementById('compose-panel').classList.add('hidden'); // Hide compose if open
             document.getElementById('detail-panel').scrollIntoView({ behavior: 'smooth' });
-            renderMessages();
+            window.renderMessages();
         }
 
-        function closeDetailPanel() {
+        window.closeDetailPanel = function() {
             document.getElementById('detail-panel').classList.add('hidden');
             activeMessage = null;
         }
 
-        function openComposePanel() {
+        window.openComposePanel = function() {
             document.getElementById('compose-title').innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>New Message</span>`;
             document.getElementById('compose-recipient').value = '';
             document.getElementById('compose-subject').value = '';
@@ -334,7 +345,7 @@
             document.getElementById('compose-panel').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function openReplyPanel() {
+        window.openReplyPanel = function() {
             if (!activeMessage) return;
             document.getElementById('compose-title').innerHTML = `<i class="fa-solid fa-reply"></i><span>Reply to ${activeMessage.sender}</span>`;
             document.getElementById('compose-recipient').value = activeMessage.sender;
@@ -345,11 +356,11 @@
             document.getElementById('compose-panel').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function closeComposePanel() {
+        window.closeComposePanel = function() {
             document.getElementById('compose-panel').classList.add('hidden');
         }
 
-        function sendUserMessage() {
+        window.sendUserMessage = function() {
             const recipient = document.getElementById('compose-recipient').value.trim();
             const subject = document.getElementById('compose-subject').value.trim();
             const body = document.getElementById('compose-body').value.trim();
@@ -371,21 +382,30 @@
             };
 
             messagesData.sent.unshift(newMsg); // Most recent at top
-            closeComposePanel();
-            switchTab('sent');
+            window.closeComposePanel();
+            window.switchTab('sent');
         }
 
-        function toggleStar(id) {
+        window.toggleStar = function(id) {
             const list = messagesData[currentTab];
             const msg = list.find(m => m.id === id);
             if (msg) {
                 msg.starred = !msg.starred;
-                renderMessages();
+                window.renderMessages();
             }
         }
 
-        // Initialize view on load
-        renderMessages();
+        // Setup Search Listener on load
+        document.addEventListener('DOMContentLoaded', () => {
+            window.renderMessages();
+            const searchInput = document.getElementById('mail-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchQuery = e.target.value;
+                    window.renderMessages();
+                });
+            }
+        });
     </script>
 
     <!-- Background Animation Script -->
@@ -461,18 +481,18 @@
         }
         checkUserSession();
 
-      window.handleSignOut = async function() {
-    try {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            console.error("Sign out error:", error.message);
+        window.handleSignOut = async function() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) {
+                    console.error("Sign out error:", error.message);
+                }
+                window.location.href = 'index.html';
+            } catch (err) {
+                console.error("Unexpected sign out error:", err);
+                window.location.href = 'index.html';
+            }
         }
-        window.location.href = 'index.html';
-    } catch (err) {
-        console.error("Unexpected sign out error:", err);
-        window.location.href = 'index.html';
-    }
-}
     </script>
 </body>
 </html>
